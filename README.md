@@ -3,4 +3,4 @@
 ### Codeclimate status
 [![Maintainability](https://api.codeclimate.com/v1/badges/e285271ac175c6e047be/maintainability)](https://codeclimate.com/github/KuzinaRuslana/php-project-9/maintainability)
 ### Render
-https://php-project-9-5lw8.onrender.com
+https://php-project-9-oimu.onrender.com
