@@ -11,11 +11,12 @@ use Slim\Views\PhpRenderer;
 use Hexlet\Code\PagesRepository;
 use Hexlet\Code\Validator;
 
+if (file_exists(__DIR__ . '/../.env')) {
+    $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv->safeload();
+}
+
 session_start();
-
-$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
-
 $container = new Container();
 
 $container->set('renderer', function () {
@@ -28,21 +29,23 @@ $container->set('flash', function () {
 
 $container->set(\PDO::class, function () {
     $databaseUrl = $_ENV['DATABASE_URL'] ?? null;
+    if (!$databaseUrl) {
+        throw new \Exception('DATABASE_URL is not set');
+    }
 
     $parsedUrl = parse_url($databaseUrl);
-
     $host = $parsedUrl['host'];
-    $port = $parsedUrl['port'] ?? 5432;
+    $port = $parsedUrl['port'];
     $dbname = ltrim($parsedUrl['path'], '/');
     $username = $parsedUrl['user'];
     $password = $parsedUrl['pass'];
 
     $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
 
-    $pdo = new \PDO($dsn, $username, $password);
-    $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+    $conn = new \PDO($dsn, $username, $password);
+    $conn->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
-    return $pdo;
+    return $conn;
 });
 
 AppFactory::setContainer($container);
