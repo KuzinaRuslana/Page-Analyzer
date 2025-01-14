@@ -35,7 +35,7 @@ $container->set(\PDO::class, function () {
 
     $parsedUrl = parse_url($databaseUrl);
     $host = $parsedUrl['host'];
-    $port = $parsedUrl['port'];
+    $port = $parsedUrl['port'] ?? '5432';
     $dbname = ltrim($parsedUrl['path'], '/');
     $username = $parsedUrl['user'];
     $password = $parsedUrl['pass'];
