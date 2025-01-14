@@ -23,10 +23,10 @@
                                 </a>
                             </td>
                             <td>
-                                <?= htmlspecialchars($url['last_checked'] ?? null) ?>
+                                <?= htmlspecialchars($url['last_checked'] ?? '') ?>
                             </td>
                             <td>
-                                <?= htmlspecialchars($url['status_code'] ?? null) ?>
+                                <?= htmlspecialchars($url['status_code'] ?? '') ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
