@@ -13,13 +13,6 @@ class PagesRepository
         $this->conn = $conn;
     }
 
-    public function getAll(): array
-    {
-        $sql = 'SELECT * FROM urls ORDER BY id DESC';
-        $stmt = $this->conn->query($sql);
-        return $stmt->fetchAll();
-    }
-
     public function find($id): mixed
     {
         $sql = 'SELECT * FROM urls WHERE id = ?';
@@ -36,18 +29,18 @@ class PagesRepository
     }
 
     public function save(string $name): int
-{
-    $sql = 'INSERT INTO urls (name, created_at) VALUES (:name, :created_at) RETURNING id';
-    $stmt = $this->conn->prepare($sql);
-    $date = Carbon::now();
-    $stmt->execute([
-        'name' => $name,
-        'created_at' => $date,
-    ]);
+    {
+        $sql = 'INSERT INTO urls (name, created_at) VALUES (:name, :created_at) RETURNING id';
+        $stmt = $this->conn->prepare($sql);
+        $date = Carbon::now();
+        $stmt->execute([
+            'name' => $name,
+            'created_at' => $date,
+        ]);
 
-    $id = $stmt->fetchColumn();
-    return (int) $id;
-}
+        $id = $stmt->fetchColumn();
+        return (int) $id;
+    }
 
     public function findByName(string $name): ?array
     {

@@ -17,21 +17,19 @@ if (file_exists(__DIR__ . '/../.env')) {
 }
 
 session_start();
+
 $container = new Container();
 
-$container->set('renderer', function () {
+$container->set('renderer', function (): PhpRenderer {
     return new PhpRenderer(__DIR__ . '/../templates');
 });
 
-$container->set('flash', function () {
+$container->set('flash', function (): Messages {
     return new Messages();
 });
 
-$container->set(\PDO::class, function () {
+$container->set(\PDO::class, function (): PDO {
     $databaseUrl = $_ENV['DATABASE_URL'] ?? null;
-    if (!$databaseUrl) {
-        throw new \Exception('DATABASE_URL is not set');
-    }
 
     $parsedUrl = parse_url($databaseUrl);
     $host = $parsedUrl['host'];
@@ -50,7 +48,6 @@ $container->set(\PDO::class, function () {
 
 AppFactory::setContainer($container);
 $app = AppFactory::create();
-$app->add(MethodOverrideMiddleware::class);
 $app->addErrorMiddleware(true, true, true);
 
 $router = $app->getRouteCollector()->getRouteParser();
@@ -62,48 +59,56 @@ $app->get('/', function ($request, $response) {
 $app->get('/urls', function ($request, $response) {
     $repo = new PagesRepository($this->get(\PDO::class));
     $urls = $repo->findAll();
-
-    return $this->get('renderer')->render($response, 'urls.phtml', ['urls' => $urls]);
+    $params = ['urls' => $urls];
+    return $this->get('renderer')->render($response, 'urls.phtml', $params);
 })->setName('urls');
 
 $app->post('/urls', function ($request, $response) use ($router) {
     $repo = new PagesRepository($this->get(\PDO::class));
-    $data = $request->getParsedBodyParam('url');
+    $UrlData = $request->getParsedBodyParam('url');
+
     $validator = new Validator();
-    $errors = $validator->validateUrl($data);
+    $errors = $validator->validateUrl($UrlData);
 
     if (count($errors) > 0) {
-        $params = ['errors' => $errors, 'url' => $data];
+        $params = [
+            'errors' => $errors,
+            'url' => $UrlData
+        ];
         $response = $response->withStatus(422);
         return $this->get('renderer')->render($response, 'index.phtml', $params);
     }
 
-    $parsedUrl = parse_url($data['name']);
+    $parsedUrl = parse_url($UrlData['name']);
     $normalizedUrl = strtolower("{$parsedUrl['scheme']}://{$parsedUrl['host']}");
 
     $existingPage = $repo->findByName($normalizedUrl);
     if ($existingPage) {
         $this->get('flash')->addMessage('info', 'Страница уже существует');
-        return $response->withRedirect($router->urlFor('url', ['id' => $existingPage['id']]));
+        $params = ['id' => $existingPage['id']];
+        return $response->withRedirect($router->urlFor('url', $params));
     }
 
     $newPageId = $repo->save($normalizedUrl);
     $this->get('flash')->addMessage('success', 'URL успешно добавлен');
-    return $response->withRedirect($router->urlFor('url', ['id' => $newPageId]));
+    $params = ['id' => $newPageId];
+    return $response->withRedirect($router->urlFor('url', $params));
 });
 
 $app->get('/urls/{id}', function ($request, $response, $args) {
     $repo = new PagesRepository($this->get(\PDO::class));
-    $page = $repo->find($args['id']);
-    $flash = $this->get('flash')->getMessages();
-    
+    $id = $args['id'];
+    $page = $repo->find($id);
+
     if (!$page) {
         return $response->withStatus(404)->write('Page not found');
     }
 
+    $flash = $this->get('flash')->getMessages();
+
     $params = [
         'page' => $page,
-        'checks' => $repo->getChecks($args['id']), // Получаем проверки (реализуем ниже)
+        'checks' => $repo->getChecks($args['id']),
         'flash' => $flash
     ];
 
