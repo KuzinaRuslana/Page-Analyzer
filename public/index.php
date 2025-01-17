@@ -62,11 +62,12 @@ $app->get('/urls', function ($request, $response) {
     $checksRepo = new ChecksRepository($this->get(\PDO::class));
     $urls = $repo->findAll();
 
-    foreach ($urls as &$url) {
+    $urlsWithLastChecks = array_map(function ($url) use ($checksRepo) {
         $url['last_check'] = $checksRepo->getLastCheckDate($url['id']);
-    }
+        return $url;
+    }, $urls);
 
-    $params = ['urls' => $urls];
+    $params = ['urls' => $urlsWithLastChecks];
     return $this->get('renderer')->render($response, 'urls.phtml', $params);
 })->setName('urls');
 
@@ -128,6 +129,7 @@ $app->post('/urls/{url_id}/checks', function ($request, $response, $args) use ($
 
     $checksRepo = new ChecksRepository($this->get(\PDO::class));
     $checksRepo->addCheck($urlId);
+    $this->get('flash')->addMessage('success', 'Страница успешно проверена');
     $params = ['id' => $urlId];
     return $response->withRedirect($router->urlFor('url', $params));
 })->setName('url_check');

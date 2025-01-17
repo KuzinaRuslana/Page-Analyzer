@@ -32,14 +32,6 @@ class ChecksRepository
         return $stmt->fetchAll();
     }
 
-    public function findByUrlId(int $urlId): array
-    {
-        $sql = 'SELECT * FROM url_checks WHERE url_id = :url_id ORDER BY created_at DESC';
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute(['url_id' => $urlId]);
-        return $stmt->fetchAll();
-    }
-
     public function getLastCheckDate(int $urlId): ?string
     {
         $sql = 'SELECT created_at FROM url_checks WHERE url_id = :url_id ORDER BY created_at DESC LIMIT 1';
