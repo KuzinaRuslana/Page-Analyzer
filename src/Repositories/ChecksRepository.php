@@ -37,6 +37,6 @@ class ChecksRepository
         $sql = 'SELECT created_at FROM url_checks WHERE url_id = :url_id ORDER BY created_at DESC LIMIT 1';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute(['url_id' => $urlId]);
-        return $stmt->fetchColumn() ?: null;
+        return $stmt->fetchColumn();
     }
 }
