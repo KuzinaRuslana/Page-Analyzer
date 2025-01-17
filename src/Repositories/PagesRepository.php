@@ -1,6 +1,6 @@
 <?php
 
-namespace Hexlet\Code;
+namespace Hexlet\Code\Repositories;
 
 use Carbon\Carbon;
 
@@ -35,7 +35,7 @@ class PagesRepository
         $date = Carbon::now();
         $stmt->execute([
             'name' => $name,
-            'created_at' => $date,
+            'created_at' => $date
         ]);
 
         $id = $stmt->fetchColumn();
@@ -49,13 +49,5 @@ class PagesRepository
         $stmt->execute(['name' => $name]);
         $result = $stmt->fetch();
         return $result ?: null;
-    }
-
-    public function getChecks(int $urlId): array
-    {
-        $sql = 'SELECT * FROM url_checks WHERE url_id = :url_id ORDER BY created_at DESC';
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute(['url_id' => $urlId]);
-        return $stmt->fetchAll();
     }
 }

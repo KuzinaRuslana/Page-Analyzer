@@ -8,7 +8,8 @@ use Slim\Factory\AppFactory;
 use Slim\Flash\Messages;
 use Slim\Middleware\MethodOverrideMiddleware;
 use Slim\Views\PhpRenderer;
-use Hexlet\Code\PagesRepository;
+use Hexlet\Code\Repositories\PagesRepository;
+use Hexlet\Code\Repositories\ChecksRepository;
 use Hexlet\Code\Validator;
 
 if (file_exists(__DIR__ . '/../.env')) {
@@ -58,7 +59,13 @@ $app->get('/', function ($request, $response) {
 
 $app->get('/urls', function ($request, $response) {
     $repo = new PagesRepository($this->get(\PDO::class));
+    $checksRepo = new ChecksRepository($this->get(\PDO::class));
     $urls = $repo->findAll();
+
+    foreach ($urls as &$url) {
+        $url['last_check'] = $checksRepo->getLastCheckDate($url['id']);
+    }
+
     $params = ['urls' => $urls];
     return $this->get('renderer')->render($response, 'urls.phtml', $params);
 })->setName('urls');
@@ -99,6 +106,7 @@ $app->get('/urls/{id}', function ($request, $response, $args) {
     $repo = new PagesRepository($this->get(\PDO::class));
     $id = $args['id'];
     $page = $repo->find($id);
+    $checksRepo = new ChecksRepository($this->get(\PDO::class));
 
     if (!$page) {
         return $response->withStatus(404)->write('Page not found');
@@ -108,11 +116,20 @@ $app->get('/urls/{id}', function ($request, $response, $args) {
 
     $params = [
         'page' => $page,
-        'checks' => $repo->getChecks($args['id']),
+        'checks' => $checksRepo->getChecks($args['id']),
         'flash' => $flash
     ];
 
     return $this->get('renderer')->render($response, 'url.phtml', $params);
 })->setName('url');
+
+$app->post('/urls/{url_id}/checks', function ($request, $response, $args) use ($router) {
+    $urlId = (int) $args['url_id'];
+
+    $checksRepo = new ChecksRepository($this->get(\PDO::class));
+    $checksRepo->addCheck($urlId);
+    $params = ['id' => $urlId];
+    return $response->withRedirect($router->urlFor('url', $params));
+})->setName('url_check');
 
 $app->run();

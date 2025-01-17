@@ -8,7 +8,6 @@
         <?php if (!empty($flash['success'])): ?>
             <div class="alert alert-success"><?= htmlspecialchars($flash['success'][0]) ?></div>
         <?php endif; ?>
-
         <h1>Сайт: <?= htmlspecialchars($page['name']) ?></h1>
         <div class="table-responsive">
             <table class="table table-bordered table-hover text-nowrap" data-test="url">
@@ -28,7 +27,6 @@
                 </tbody>
             </table>
         </div>
-
         <h2 class="mt-5 mb-3">Проверки</h2>
         <form method="post" action="/urls/<?= htmlspecialchars($page['id']) ?>/checks">
             <input type="submit" class="btn btn-primary" value="Запустить проверку">
