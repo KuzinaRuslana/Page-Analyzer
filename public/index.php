@@ -66,8 +66,8 @@ $app->get('/urls', function ($request, $response) {
     $urlsWithLastChecks = array_map(function ($url) use ($checksRepo) {
         $lastCheck = $checksRepo->getLastCheckData($url['id']);
         $url['data'] = [
-            'last_check' => $lastCheck['created_at'] ?? null,
-            'status_code' => $lastCheck['status_code'] ?? null
+            'last_check' => $lastCheck['created_at'] ?? '',
+            'status_code' => $lastCheck['status_code'] ?? ''
         ];
         return $url;
     }, $urls);
