@@ -13,13 +13,14 @@ class ChecksRepository
         $this->conn = $conn;
     }
 
-    public function addCheck(int $urlId): void
+    public function addCheck(int $urlId, int $statusCode): void
     {
-        $sql = 'INSERT INTO url_checks (url_id, created_at) VALUES (:url_id, :created_at)';
+        $sql = 'INSERT INTO url_checks (url_id, status_code, created_at) VALUES (:url_id, :status_code, :created_at)';
         $stmt = $this->conn->prepare($sql);
         $date = Carbon::now();
         $stmt->execute([
             'url_id' => $urlId,
+            'status_code' => $statusCode,
             'created_at' => $date,
         ]);
     }
@@ -32,11 +33,11 @@ class ChecksRepository
         return $stmt->fetchAll();
     }
 
-    public function getLastCheckDate(int $urlId): ?string
+    public function getLastCheckData(int $urlId): ?array
     {
-        $sql = 'SELECT created_at FROM url_checks WHERE url_id = :url_id ORDER BY created_at DESC LIMIT 1';
+        $sql = 'SELECT status_code, created_at FROM url_checks WHERE url_id = :url_id ORDER BY created_at DESC LIMIT 1';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute(['url_id' => $urlId]);
-        return $stmt->fetchColumn();
+        return $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
     }
 }

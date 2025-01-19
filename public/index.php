@@ -11,6 +11,7 @@ use Slim\Views\PhpRenderer;
 use Hexlet\Code\Repositories\PagesRepository;
 use Hexlet\Code\Repositories\ChecksRepository;
 use Hexlet\Code\Validator;
+use GuzzleHttp\Client;
 
 if (file_exists(__DIR__ . '/../.env')) {
     $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
@@ -58,12 +59,16 @@ $app->get('/', function ($request, $response) {
 })->setName('home');
 
 $app->get('/urls', function ($request, $response) {
-    $repo = new PagesRepository($this->get(\PDO::class));
+    $pagesRepo = new PagesRepository($this->get(\PDO::class));
     $checksRepo = new ChecksRepository($this->get(\PDO::class));
-    $urls = $repo->findAll();
+    $urls = $pagesRepo->findAll();
 
     $urlsWithLastChecks = array_map(function ($url) use ($checksRepo) {
-        $url['last_check'] = $checksRepo->getLastCheckDate($url['id']);
+        $lastCheck = $checksRepo->getLastCheckData($url['id']);
+        $url['data'] = [
+            'last_check' => $lastCheck['created_at'] ?? null,
+            'status_code' => $lastCheck['status_code'] ?? null
+        ];
         return $url;
     }, $urls);
 
@@ -72,7 +77,7 @@ $app->get('/urls', function ($request, $response) {
 })->setName('urls');
 
 $app->post('/urls', function ($request, $response) use ($router) {
-    $repo = new PagesRepository($this->get(\PDO::class));
+    $pagesRepo = new PagesRepository($this->get(\PDO::class));
     $UrlData = $request->getParsedBodyParam('url');
 
     $validator = new Validator();
@@ -90,23 +95,23 @@ $app->post('/urls', function ($request, $response) use ($router) {
     $parsedUrl = parse_url($UrlData['name']);
     $normalizedUrl = strtolower("{$parsedUrl['scheme']}://{$parsedUrl['host']}");
 
-    $existingPage = $repo->findByName($normalizedUrl);
+    $existingPage = $pagesRepo->findByName($normalizedUrl);
     if ($existingPage) {
         $this->get('flash')->addMessage('info', 'Страница уже существует');
         $params = ['id' => $existingPage['id']];
         return $response->withRedirect($router->urlFor('url', $params));
     }
 
-    $newPageId = $repo->save($normalizedUrl);
+    $newPageId = $pagesRepo->save($normalizedUrl);
     $this->get('flash')->addMessage('success', 'URL успешно добавлен');
     $params = ['id' => $newPageId];
     return $response->withRedirect($router->urlFor('url', $params));
 });
 
 $app->get('/urls/{id}', function ($request, $response, $args) {
-    $repo = new PagesRepository($this->get(\PDO::class));
+    $pagesRepo = new PagesRepository($this->get(\PDO::class));
     $id = $args['id'];
-    $page = $repo->find($id);
+    $page = $pagesRepo->find($id);
     $checksRepo = new ChecksRepository($this->get(\PDO::class));
 
     if (!$page) {
@@ -126,10 +131,20 @@ $app->get('/urls/{id}', function ($request, $response, $args) {
 
 $app->post('/urls/{url_id}/checks', function ($request, $response, $args) use ($router) {
     $urlId = (int) $args['url_id'];
-
+    $pagesRepo = new PagesRepository($this->get(\PDO::class));
     $checksRepo = new ChecksRepository($this->get(\PDO::class));
-    $checksRepo->addCheck($urlId);
-    $this->get('flash')->addMessage('success', 'Страница успешно проверена');
+    $client = new Client();
+    $url = $pagesRepo->find($urlId);
+
+    try {
+        $res = $client->get($url['name']);
+        $statusCode = $res->getStatusCode();
+        $checksRepo->addCheck($urlId, $statusCode);
+        $this->get('flash')->addMessage('success', 'Страница успешно проверена');
+    } catch (\Exception $e) {
+        $this->get('flash')->addMessage('error', 'Произошла ошибка при проверке, не удалось подключиться');
+    }
+
     $params = ['id' => $urlId];
     return $response->withRedirect($router->urlFor('url', $params));
 })->setName('url_check');
