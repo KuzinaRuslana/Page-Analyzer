@@ -28,15 +28,14 @@ class PagesRepository
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function save(string $name, $statusCode = ''): int
+    public function save(string $name): int
     {
-        $sql = 'INSERT INTO urls (name, status_code, created_at)
-                VALUES (:name, :status_code, :created_at) RETURNING id';
+        $sql = 'INSERT INTO urls (name, created_at)
+                VALUES (:name, :created_at) RETURNING id';
         $stmt = $this->conn->prepare($sql);
         $date = Carbon::now();
         $stmt->execute([
             'name' => $name,
-            'status_code' => $statusCode,
             'created_at' => $date
         ]);
 
