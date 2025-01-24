@@ -7,6 +7,7 @@ use Dotenv\Dotenv;
 use Slim\Factory\AppFactory;
 use Slim\Flash\Messages;
 use Slim\Views\PhpRenderer;
+use Slim\Exception\HttpNotFoundException;
 
 if (file_exists(__DIR__ . '/../.env')) {
     $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
@@ -47,7 +48,12 @@ AppFactory::setContainer($container);
 $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
 
-$handlers = require __DIR__ . '/../src/handlers.php';
-$handlers($app);
+$errorMiddleware = $app->addErrorMiddleware(true, true, true);
+
+$routes = require __DIR__ . '/../src/routes.php';
+$routes($app);
+
+$errorHandler = require __DIR__ . '/../src/errorHandler.php';
+$errorHandler($app);
 
 $app->run();

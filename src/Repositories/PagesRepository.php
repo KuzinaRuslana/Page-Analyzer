@@ -28,6 +28,15 @@ class PagesRepository
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    public function findByName(string $name): ?array
+    {
+        $sql = 'SELECT * FROM urls WHERE name = :name';
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute(['name' => $name]);
+        $result = $stmt->fetch();
+        return $result ?: null;
+    }
+
     public function save(string $name): int
     {
         $sql = 'INSERT INTO urls (name, created_at)
@@ -41,14 +50,5 @@ class PagesRepository
 
         $id = $stmt->fetchColumn();
         return (int) $id;
-    }
-
-    public function findByName(string $name): ?array
-    {
-        $sql = 'SELECT * FROM urls WHERE name = :name';
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute(['name' => $name]);
-        $result = $stmt->fetch();
-        return $result ?: null;
     }
 }
