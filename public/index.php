@@ -7,7 +7,7 @@ use Dotenv\Dotenv;
 use Slim\Factory\AppFactory;
 use Slim\Flash\Messages;
 use Slim\Views\PhpRenderer;
-use Slim\Exception\HttpNotFoundException;
+
 
 if (file_exists(__DIR__ . '/../.env')) {
     $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
@@ -18,15 +18,15 @@ session_start();
 
 $container = new Container();
 
-$container->set('renderer', function (): PhpRenderer {
+$container->set('renderer', function () {
     return new PhpRenderer(__DIR__ . '/../templates');
 });
 
-$container->set('flash', function (): Messages {
+$container->set('flash', function () {
     return new Messages();
 });
 
-$container->set(\PDO::class, function (): PDO {
+$container->set(\PDO::class, function () {
     $databaseUrl = $_ENV['DATABASE_URL'] ?? null;
 
     $parsedUrl = parse_url($databaseUrl);
@@ -44,16 +44,13 @@ $container->set(\PDO::class, function (): PDO {
     return $conn;
 });
 
-AppFactory::setContainer($container);
-$app = AppFactory::create();
+$app = AppFactory::createFromContainer($container);
 $app->addErrorMiddleware(true, true, true);
 
-$errorMiddleware = $app->addErrorMiddleware(true, true, true);
-
-$routes = require __DIR__ . '/../src/routes.php';
+$routes = require __DIR__ . '/../src/Routes.php';
 $routes($app);
 
-$errorHandler = require __DIR__ . '/../src/errorHandler.php';
+$errorHandler = require __DIR__ . '/../src/ErrorHandler.php';
 $errorHandler($app);
 
 $app->run();

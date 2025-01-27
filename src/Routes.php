@@ -2,7 +2,7 @@
 
 use Hexlet\Code\Repositories\PagesRepository;
 use Hexlet\Code\Repositories\ChecksRepository;
-use Hexlet\Code\Validator;
+use Hexlet\Code\UrlValidator;
 use GuzzleHttp\Client;
 use DiDom\Document;
 
@@ -33,24 +33,24 @@ return function ($app) {
 
     $app->post('/urls', function ($request, $response) use ($router) {
         $pagesRepo = new PagesRepository($this->get(\PDO::class));
-        $UrlData = $request->getParsedBodyParam('url');
+        $urlData = $request->getParsedBodyParam('url');
 
-        $validator = new Validator();
-        $errors = $validator->validateUrl($UrlData);
+        $validator = new UrlValidator();
+        $errors = $validator->validateUrl($urlData);
 
         if (count($errors) > 0) {
             $params = [
                 'errors' => $errors,
-                'url' => $UrlData
+                'url' => $urlData
             ];
             $response = $response->withStatus(422);
             return $this->get('renderer')->render($response, 'index.phtml', $params);
         }
 
-        $parsedUrl = parse_url($UrlData['name']);
+        $parsedUrl = parse_url($urlData['name']);
         $normalizedUrl = strtolower("{$parsedUrl['scheme']}://{$parsedUrl['host']}");
-
         $existingPage = $pagesRepo->findByName($normalizedUrl);
+
         if ($existingPage) {
             $this->get('flash')->addMessage('info', 'Страница уже существует');
             $params = ['id' => $existingPage['id']];
@@ -65,16 +65,11 @@ return function ($app) {
 
     $app->get('/urls/{id}', function ($request, $response, $args) {
         $pagesRepo = new PagesRepository($this->get(\PDO::class));
-        $id = $args['id'];
-        $page = $pagesRepo->find($id);
         $checksRepo = new ChecksRepository($this->get(\PDO::class));
 
-        if (!$page) {
-            return $response->withStatus(404)->write('Page not found');
-        }
-
+        $id = $args['id'];
+        $page = $pagesRepo->findById($id);
         $flash = $this->get('flash')->getMessages();
-
         $params = [
             'page' => $page,
             'checks' => $checksRepo->getChecks($args['id']),
@@ -89,12 +84,12 @@ return function ($app) {
         $pagesRepo = new PagesRepository($this->get(\PDO::class));
         $checksRepo = new ChecksRepository($this->get(\PDO::class));
         $client = new Client();
-        $url = $pagesRepo->find($urlId);
+        $url = $pagesRepo->findById($urlId);
 
         try {
-            $res = $client->get($url['name']);
-            $statusCode = $res->getStatusCode();
-            $body = (string) $res->getBody();
+            $urlName = $client->get($url['name']);
+            $statusCode = $urlName->getStatusCode();
+            $body = (string) $urlName->getBody();
 
             $document = new Document($body);
             $h1 = optional($document->first('h1'))->text();

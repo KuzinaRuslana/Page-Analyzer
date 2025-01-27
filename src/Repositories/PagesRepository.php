@@ -13,19 +13,12 @@ class PagesRepository
         $this->conn = $conn;
     }
 
-    public function find($id): mixed
+    public function findById(int $id): mixed
     {
         $sql = 'SELECT * FROM urls WHERE id = ?';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$id]);
         return $stmt->fetch();
-    }
-
-    public function findAll(): array
-    {
-        $sql = 'SELECT * FROM urls ORDER BY created_at DESC';
-        $statement = $this->conn->query($sql);
-        return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function findByName(string $name): ?array
@@ -35,6 +28,13 @@ class PagesRepository
         $stmt->execute(['name' => $name]);
         $result = $stmt->fetch();
         return $result ?: null;
+    }
+
+    public function findAll(): array
+    {
+        $sql = 'SELECT * FROM urls ORDER BY created_at DESC';
+        $statement = $this->conn->query($sql);
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function save(string $name): int

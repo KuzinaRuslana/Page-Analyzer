@@ -2,7 +2,7 @@
 
 namespace Hexlet\Code;
 
-class Validator
+class UrlValidator
 {
     public function validateUrl(array $data): array
     {

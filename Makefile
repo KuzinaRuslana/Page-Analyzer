@@ -5,7 +5,7 @@ validate:
 	composer validate
 
 lint:
-	composer exec --verbose phpcs -- --standard=PSR12 src public
+	composer exec --verbose phpcs -- --standard=PSR12 src public tests
 
 dump:
 	composer dump-autoload
