@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS urls (
     created_at TIMESTAMP NOT NULL
 );
 
-CREATE TABLE url_checks (
+CREATE TABLE IF NOT EXISTS url_checks (
     id BIGSERIAL PRIMARY KEY,
     url_id INTEGER NOT NULL REFERENCES urls(id) ON DELETE CASCADE,
     status_code INTEGER NULL,
