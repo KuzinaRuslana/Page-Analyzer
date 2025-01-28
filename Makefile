@@ -10,16 +10,12 @@ lint:
 dump:
 	composer dump-autoload
 
+PORT ?= 8080
 start:
-	PHP_CLI_SERVER_WORKERS=1 php -S 0.0.0.0:8080 -t public &
-	sleep 2
+	PHP_CLI_SERVER_WORKERS=5 php -S 0.0.0.0:$(PORT) -t public
 
 test:
-	PHP_CLI_SERVER_WORKERS=1 php -S 0.0.0.0:8080 -t public &
-	while ! curl -s http://localhost:8080 > /dev/null; do
-		sleep 1
-	done
-	PLAYWRIGHT_TEST_TIMEOUT=60000 playwright test --browser='chromium'
+	composer exec --verbose phpunit tests
 
 test-coverage:
 	XDEBUG_MODE=coverage composer exec phpunit tests -- --coverage-clover ./build/logs/clover.xml
