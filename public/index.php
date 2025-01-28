@@ -46,10 +46,14 @@ $container->set(\PDO::class, function () {
 $app = AppFactory::createFromContainer($container);
 $app->addErrorMiddleware(true, true, true);
 
-$routes = require __DIR__ . '/../src/Routes.php';
-$routes($app);
+$app->get('/', function ($request, $response) {
+    return $this->get('renderer')->render($response, 'index.phtml');
+})->setName('home');
 
-$errorHandler = require __DIR__ . '/../src/ErrorHandler.php';
-$errorHandler($app);
+// $routes = require __DIR__ . '/../src/Routes.php';
+// $routes($app);
+
+// $errorHandler = require __DIR__ . '/../src/ErrorHandler.php';
+// $errorHandler($app);
 
 $app->run();
