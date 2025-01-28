@@ -1,4 +1,4 @@
-FROM php:8.3-cli
+FROM php:8.1-cli
 
 
 RUN apt-get update && apt-get install -y libzip-dev libpq-dev
@@ -14,4 +14,4 @@ COPY . .
 
 RUN composer install
 
-CMD ["bash", "-c", "php -S 0.0.0.0:8080 -t public"]
+CMD ["bash", "-c", "make start"]

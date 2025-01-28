@@ -9,10 +9,9 @@ use Slim\Flash\Messages;
 use Slim\Views\PhpRenderer;
 
 
-if (file_exists(__DIR__ . '/../.env')) {
-    $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-    $dotenv->safeload();
-}
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->safeload();
+$dotenv->required(['DATABASE_URL'])->notEmpty();
 
 session_start();
 
