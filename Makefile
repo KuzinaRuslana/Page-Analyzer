@@ -15,7 +15,11 @@ start:
 	sleep 2
 
 test:
-	composer exec --verbose phpunit tests
+	PHP_CLI_SERVER_WORKERS=1 php -S 0.0.0.0:8080 -t public &
+	while ! curl -s http://localhost:8080 > /dev/null; do
+		sleep 1
+	done
+	PLAYWRIGHT_TEST_TIMEOUT=60000 playwright test --browser='chromium'
 
 test-coverage:
 	XDEBUG_MODE=coverage composer exec phpunit tests -- --coverage-clover ./build/logs/clover.xml
