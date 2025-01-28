@@ -11,7 +11,8 @@ dump:
 	composer dump-autoload
 
 start:
-	php -S 0.0.0.0:8080 -t public
+	PHP_CLI_SERVER_WORKERS=1 php -S 0.0.0.0:8080 -t public &
+	sleep 2
 
 test:
 	composer exec --verbose phpunit tests
