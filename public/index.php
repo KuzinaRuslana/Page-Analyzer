@@ -8,7 +8,7 @@ use Slim\Factory\AppFactory;
 use Slim\Flash\Messages;
 use Slim\Views\PhpRenderer;
 
-
+die('asd');
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->safeload();
 $dotenv->required(['DATABASE_URL'])->notEmpty();
