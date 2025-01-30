@@ -2,7 +2,6 @@
 
 namespace Hexlet\Code;
 
-
 use Valitron\Validator;
 
 class UrlValidator
