@@ -2,16 +2,25 @@
 
 namespace Hexlet\Code;
 
+
+use Valitron\Validator;
+
 class UrlValidator
 {
     public function validateUrl(array $data): array
     {
         $errors = [];
-        $url = $data['name'] ?? '';
 
-        if (empty($url)) {
+        if (empty($data['name'])) {
             $errors['name'] = 'URL не должен быть пустым';
-        } elseif (strlen($url) > 255 || !filter_var($url, FILTER_VALIDATE_URL)) {
+            return $errors;
+        }
+
+        $url = new Validator(['name' => $data['name']]);
+        $url->rule('url', 'name');
+        $url->rule('lengthMax', 'name', 255);
+
+        if (!$url->validate()) {
             $errors['name'] = 'Некорректный URL';
         }
 
