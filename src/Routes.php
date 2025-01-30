@@ -94,7 +94,8 @@ return function ($app) {
             $document = new Document($body);
             $h1 = optional($document->first('h1'))->text();
             $title = optional($document->first('title'))->text();
-            $description = optional($document->first('meta[name=description]'))->getAttribute('content') ?? null;
+            $descriptionTag = $document->first('meta[name=description]');
+            $description = $descriptionTag ? $descriptionTag->getAttribute('content') : null;
             $checksRepo->addCheck($urlId, $statusCode, $h1, $title, $description);
             $this->get('flash')->addMessage('success', 'Страница успешно проверена');
         } catch (\Exception $e) {
