@@ -6,7 +6,7 @@ use Carbon\Carbon;
 
 class PagesRepository
 {
-    private $conn;
+    private \PDO $conn;
 
     public function __construct(\PDO $conn)
     {
