@@ -58,7 +58,7 @@ return function ($app) {
         }
 
         $newPageId = $pagesRepo->save($normalizedUrl);
-        $this->get('flash')->addMessage('success', 'URL успешно добавлен');
+        $this->get('flash')->addMessage('success', 'Страница успешно добавлена');
         $params = ['id' => $newPageId];
         return $response->withRedirect($router->urlFor('url', $params));
     });
