@@ -8,6 +8,8 @@ use Slim\Factory\AppFactory;
 use Slim\Flash\Messages;
 use Slim\Views\PhpRenderer;
 use Hexlet\Code\Connection;
+use Hexlet\Code\Router;
+use Hexlet\Code\ErrorHandler;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->safeload();
@@ -32,10 +34,8 @@ $container->set(\PDO::class, function () {
 $app = AppFactory::createFromContainer($container);
 $app->addErrorMiddleware(true, true, true);
 
-$routes = require __DIR__ . '/../src/Routes.php';
-$routes($app);
+Router::init($app);
 
-$errorHandler = require __DIR__ . '/../src/ErrorHandler.php';
-$errorHandler($app);
+ErrorHandler::init($app);
 
 $app->run();
