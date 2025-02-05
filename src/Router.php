@@ -12,6 +12,9 @@ use DiDom\Document;
 
 class Router
 {
+    /**
+     * @param App<Container> $app
+     */
     public static function init(App $app): void
     {
         /** @var Container $container */

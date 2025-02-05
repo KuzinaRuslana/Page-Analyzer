@@ -9,6 +9,9 @@ use Psr\Http\Message\ResponseInterface as Response;
 
 class ErrorHandler
 {
+    /**
+     * @param App<Container> $app
+     */
     public static function init(App $app): void
     {
         /** @var Container $container */
