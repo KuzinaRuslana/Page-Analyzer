@@ -7,6 +7,7 @@ use Dotenv\Dotenv;
 use Slim\Factory\AppFactory;
 use Slim\Flash\Messages;
 use Slim\Views\PhpRenderer;
+use Hexlet\Code\Connection;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->safeload();
@@ -25,21 +26,7 @@ $container->set('flash', function () {
 });
 
 $container->set(\PDO::class, function () {
-    $databaseUrl = $_ENV['DATABASE_URL'] ?? null;
-
-    $parsedUrl = parse_url($databaseUrl);
-    $host = $parsedUrl['host'];
-    $port = $parsedUrl['port'] ?? '5432';
-    $dbname = ltrim($parsedUrl['path'], '/');
-    $username = $parsedUrl['user'];
-    $password = $parsedUrl['pass'];
-
-    $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
-
-    $conn = new \PDO($dsn, $username, $password);
-    $conn->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
-
-    return $conn;
+    return Connection::get();
 });
 
 $app = AppFactory::createFromContainer($container);
