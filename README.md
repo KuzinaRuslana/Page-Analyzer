@@ -10,7 +10,7 @@ https://php-project-9-oimu.onrender.com
 ### What is Page Analyzer
 Page Analyzer is a simple SEO tool that helps you to analyze how websites perform on search engines.
 
-### Requirments
+### Requirements
 PHP version >= 8
 Composer
 PostgreSQL
