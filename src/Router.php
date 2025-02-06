@@ -3,6 +3,7 @@
 namespace Hexlet\Code;
 
 use Slim\App;
+use Slim\Exception\HttpNotFoundException;
 use DI\Container;
 use Hexlet\Code\Repositories\PagesRepository;
 use Hexlet\Code\Repositories\ChecksRepository;
@@ -85,6 +86,11 @@ class Router
 
             $id = $args['id'];
             $page = $pagesRepo->findById($id);
+
+            if (!$page) {
+                throw new HttpNotFoundException($request);
+            }
+
             $flash = $container->get('flash')->getMessages();
             $params = [
                 'page' => $page,

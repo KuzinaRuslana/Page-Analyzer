@@ -32,10 +32,10 @@ $container->set(\PDO::class, function () {
 });
 
 $app = AppFactory::createFromContainer($container);
-$app->addErrorMiddleware(true, true, true);
+$errorMiddleware = $app->addErrorMiddleware(true, true, true);
+
+ErrorHandler::register($errorMiddleware, $container->get('renderer'));
 
 Router::init($app);
-
-ErrorHandler::init($app);
 
 $app->run();

@@ -2,30 +2,45 @@
 
 namespace Hexlet\Code;
 
-use Slim\App;
-use DI\Container;
-use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Exception\HttpNotFoundException;
+use Slim\Interfaces\ErrorHandlerInterface;
+use Slim\Middleware\ErrorMiddleware;
+use Slim\Views\PhpRenderer;
+use Throwable;
 
-class ErrorHandler
+class ErrorHandler implements ErrorHandlerInterface
 {
-    /**
-     * @param App<Container> $app
-     */
-    public static function init(App $app): void
-    {
-        /** @var Container $container */
-        $container = $app->getContainer();
+    private PhpRenderer $renderer;
 
-        $app->map(
-            ['GET', 'POST', 'PUT', 'DELETE'],
-            '/{routes:.+}',
-            function (Request $request, Response $response) use ($container) {
-                return $container->get('renderer')->render(
-                    $response->withStatus(404),
-                    'error404.phtml'
-                );
-            }
-        );
+    public function __construct(PhpRenderer $renderer)
+    {
+        $this->renderer = $renderer;
+    }
+
+    public function __invoke(
+        Request $request,
+        Throwable $exception,
+        bool $displayErrorDetails,
+        bool $logErrors,
+        bool $logErrorDetails
+    ): Response {
+        $response = new \Slim\Psr7\Response();
+
+        if ($exception instanceof HttpNotFoundException) {
+            return $this->renderer->render($response->withStatus(404), 'error404.phtml', [
+                'currentRoute' => 'error'
+            ]);
+        }
+
+        return $this->renderer->render($response->withStatus(500), 'error500.phtml', [
+            'currentRoute' => 'error'
+        ]);
+    }
+
+    public static function register(ErrorMiddleware $errorMiddleware, PhpRenderer $renderer)
+    {
+        $errorMiddleware->setDefaultErrorHandler(new self($renderer));
     }
 }
