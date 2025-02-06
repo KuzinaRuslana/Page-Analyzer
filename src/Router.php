@@ -22,7 +22,8 @@ class Router
         $router = $app->getRouteCollector()->getRouteParser();
 
         $app->get('/', function ($request, $response) use ($container) {
-            return $container->get('renderer')->render($response, 'index.phtml');
+            $params = ['currentRoute' => 'home'];
+            return $container->get('renderer')->render($response, 'index.phtml', $params);
         })->setName('home');
 
         $app->get('/urls', function ($request, $response) use ($container) {
@@ -39,7 +40,10 @@ class Router
                 return $url;
             }, $urls);
 
-            $params = ['urls' => $urlsWithLastChecks];
+            $params = [
+                'urls' => $urlsWithLastChecks,
+                'currentRoute' => 'urls'
+            ];
             return $container->get('renderer')->render($response, 'urls.phtml', $params);
         })->setName('urls');
 

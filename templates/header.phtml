@@ -20,10 +20,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="/">Главная</a>
+                    <a class="nav-link <?= ($currentRoute === 'home') ? 'active' : '' ?>" href="/">Главная</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/urls">Сайты</a>
+                    <a class="nav-link <?= ($currentRoute === 'urls') ? 'active' : '' ?>" href="/urls">Сайты</a>
                 </li>
                 </ul>
             </div>
