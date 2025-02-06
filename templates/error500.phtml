@@ -1,0 +1,20 @@
+<?= $this->fetch('header.phtml', ['currentRoute' => $currentRoute]) ?>
+
+<main class="flex-grow-1">
+  <div class="container-lg mt-3">
+  <h1>Извините, что-то пошло не так!</h1>
+  <div class="row row-cols-1 row-cols-lg-2 align-items-lg-center">
+  <div class="col">
+      <img class="img-fluid" alt="404 error" src="/assets/500.png" loading="lazy">
+  </div>
+  <div class="col">
+    <h2 class="h2 mb-4">
+      Ошибка 500
+    </h2>
+    <p class="fs-5 text-black mb-3">Что случилось?</p>
+    <p class="mb-4">Что-то странное произошло. Будем стараться это исправить!</p>
+  </div>
+  </div>
+  </div>
+</main>
+<?= $this->fetch('footer.phtml') ?>
