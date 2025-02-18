@@ -4,9 +4,9 @@ namespace Hexlet\Code;
 
 class Connection
 {
-    private static \PDO $pdo;
+    private \PDO $pdo;
 
-    public static function get(): \PDO
+    public function __construct()
     {
         $databaseUrl = $_ENV['DATABASE_URL'];
         $parsedUrl = parse_url($databaseUrl);
@@ -19,9 +19,12 @@ class Connection
 
         $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
 
-        $pdo = new \PDO($dsn, $username, $password);
-        $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+        $this->pdo = new \PDO($dsn, $username, $password);
+        $this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+    }
 
-        return $pdo;
+    public function get(): \PDO
+    {
+        return $this->pdo;
     }
 }

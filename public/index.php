@@ -28,7 +28,8 @@ $container->set('flash', function () {
 });
 
 $container->set(\PDO::class, function () {
-    return Connection::get();
+    $connection = new Connection();
+    return $connection->get();
 });
 
 $app = AppFactory::createFromContainer($container);
