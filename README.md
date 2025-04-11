@@ -15,7 +15,7 @@ Page Analyzer is a simple SEO tool that helps you to analyze how websites perfor
 1. Create and install the project using Git and Composer:
 ```bash
 git clone https://github.com/KuzinaRuslana/Page-Analyzer.git
-cd php-project-9
+cd Page-Analyzer
 make install
 ```
 2. Create .env file:
