@@ -2,21 +2,19 @@
 [![Actions Status](https://github.com/KuzinaRuslana/php-project-9/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/KuzinaRuslana/php-project-9/actions)
 ### My GitHub actions
 [![My check](https://github.com/KuzinaRuslana/php-project-9/actions/workflows/custom-check.yml/badge.svg)](https://github.com/KuzinaRuslana/php-project-9/actions/workflows/custom-check.yml)
-### Render link
-https://php-project-9-oimu.onrender.com
 
 ### What is Page Analyzer
 Page Analyzer is a simple SEO tool that helps you to analyze how websites perform on search engines.
 
 ### Requirements
-PHP version >= 8
-Composer
-PostgreSQL
++ PHP version >= 8
++ Composer
++ PostgreSQL
 
 ### Installation and usage
 1. Create and install the project using Git and Composer:
 ```bash
-git clone https://github.com/your_username/php-project-9.git
+git clone https://github.com/KuzinaRuslana/Page-Analyzer.git
 cd php-project-9
 make install
 ```
